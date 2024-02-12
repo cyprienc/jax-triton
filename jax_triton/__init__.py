@@ -23,12 +23,20 @@ from jax.experimental.pallas import strides_from_shape
 from jax_triton.version import __version__
 from jax_triton.version import __version_info__
 
-get_compute_capability = gpu_triton.get_compute_capability
+try:
+    get_compute_capability = gpu_triton.get_compute_capability
+except AttributeError as e:
+    raise ValueError(
+        "Cannot import get_compute_capability from jaxlib. "
+        "You may have installed a version of jaxlib that doesn't support GPU or is too old. "
+        "See: https://jax.readthedocs.io/en/latest/installation.html#pip-installation-gpu-cuda-installed-via-pip-easier"
+    ) from e
+
 if jaxlib.version.__version_info__ >= (0, 4, 14):
-  try:
-    get_serialized_metadata = gpu_triton.get_serialized_metadata
-  except AttributeError:
-    get_serialized_metadata = None
+    try:
+        get_serialized_metadata = gpu_triton.get_serialized_metadata
+    except AttributeError:
+        get_serialized_metadata = None
 
 # trailer
 del gpu_triton
